@@ -3,7 +3,7 @@ name: Deploy Google Apps Script
 on:
   push:
     branches:
-      - master # <-- Меняем на master, т.к. у тебя основная ветка master
+      - main
 
 jobs:
   deploy:

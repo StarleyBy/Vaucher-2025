@@ -1,0 +1,6 @@
+NOTICE 2025-08-29T14:32:25.505476Z [protoPayload.serviceName: clientauthconfig.googleapis.com] [protoPayload.methodName: CreateClient] [protoPayload.resourceName: clients/399222378656-5oujphm5ar1gtgnv8o7lhh94a2tkogv1.apps.googleusercontent.com] [protoPayload.authenticationInfo.principalEmail: starleyby@gmail.com] audit_log, method: "CreateClient", principal_email: "starleyby@gmail.com"
+resource.type="client_auth_config_client"
+resource.labels.client_id="399222378656-5oujphm5ar1gtgnv8o7lhh94a2tkogv1.apps.googleusercontent.com"
+resource.labels.project_id="ulpan-crm"
+JSON payload (most frequent) preview
+No results found

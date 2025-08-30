@@ -30,40 +30,40 @@ jobs:
         cat /tmp/original_token.json
         
         echo "=== Converting to clasp format ==="
-        # Конвертируем структуру токена для clasp
-        python3 << 'EOF'
-import json
-
-# Читаем оригинальный токен
-with open('/tmp/original_token.json', 'r') as f:
-    original = json.load(f)
-
-# Извлекаем данные из структуры tokens.default
-default_token = original['tokens']['default']
-
-# Создаем структуру для clasp
-clasp_format = {
-    "token": {
-        "access_token": default_token['access_token'],
-        "refresh_token": default_token['refresh_token'],
-        "scope": "https://www.googleapis.com/auth/script.projects https://www.googleapis.com/auth/script.deployments",
-        "token_type": "Bearer"
-    },
-    "oauth2ClientSettings": {
-        "clientId": default_token['client_id'],
-        "clientSecret": default_token['client_secret'],
-        "redirectUri": "http://localhost"
-    },
-    "isLocalCreds": False
-}
-
-# Сохраняем в формате clasp
-with open('/home/runner/.clasprc.json', 'w') as f:
-    json.dump(clasp_format, f, indent=2)
-
-print("✅ Token converted successfully")
-EOF
+        cat > /tmp/convert_token.py << 'PYTHON_SCRIPT'
+        import json
         
+        # Читаем оригинальный токен
+        with open('/tmp/original_token.json', 'r') as f:
+            original = json.load(f)
+        
+        # Извлекаем данные из структуры tokens.default
+        default_token = original['tokens']['default']
+        
+        # Создаем структуру для clasp
+        clasp_format = {
+            "token": {
+                "access_token": default_token['access_token'],
+                "refresh_token": default_token['refresh_token'],
+                "scope": "https://www.googleapis.com/auth/script.projects https://www.googleapis.com/auth/script.deployments",
+                "token_type": "Bearer"
+            },
+            "oauth2ClientSettings": {
+                "clientId": default_token['client_id'],
+                "clientSecret": default_token['client_secret'],
+                "redirectUri": "http://localhost"
+            },
+            "isLocalCreds": False
+        }
+        
+        # Сохраняем в формате clasp
+        with open('/home/runner/.clasprc.json', 'w') as f:
+            json.dump(clasp_format, f, indent=2)
+        
+        print("✅ Token converted successfully")
+        PYTHON_SCRIPT
+        
+        python3 /tmp/convert_token.py
         chmod 600 ~/.clasprc.json
         
         echo "=== Converted token structure ==="

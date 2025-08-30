@@ -21,15 +21,55 @@ jobs:
     - name: Install Clasp
       run: npm install -g @google/clasp@2.4.1
       
-    - name: Authenticate Clasp
+    - name: Debug Environment
+      run: |
+        echo "Node version: $(node --version)"
+        echo "NPM version: $(npm --version)"
+        echo "Clasp version: $(clasp --version)"
+        
+    - name: Authenticate Clasp with Debug
       env:
         CLASP_AUTH_TOKEN: ${{ secrets.CLASP_AUTH_TOKEN }}
       run: |
+        echo "=== Decoding token ==="
         echo $CLASP_AUTH_TOKEN | base64 -d > ~/.clasprc.json
-        chmod 600 ~/.clasprc.json
-        echo "=== DEBUG: .clasprc.json content ==="
+        echo "File created: $(ls -la ~/.clasprc.json)"
+        echo "=== File content ==="
         cat ~/.clasprc.json
-        echo "=== END DEBUG ==="
+        echo "=== File content end ==="
+        
+        # Проверим JSON валидность
+        echo "=== JSON validation ==="
+        if python3 -m json.tool ~/.clasprc.json > /dev/null 2>&1; then
+          echo "✅ JSON is valid"
+        else
+          echo "❌ JSON is invalid"
+          echo "Trying to fix..."
+          cat ~/.clasprc.json | jq . > ~/.clasprc_fixed.json 2>/dev/null || echo "jq not available"
+        fi
+        
+        chmod 600 ~/.clasprc.json
+        
+    - name: Test Clasp Authentication
+      run: |
+        echo "=== Testing clasp commands ==="
+        clasp --help | head -10
+        
+        echo "=== Trying to list projects ==="
+        clasp list || echo "List failed"
+        
+    - name: Check .clasp.json exists
+      working-directory: ./backend
+      run: |
+        echo "=== Backend directory contents ==="
+        ls -la
+        echo "=== .clasp.json content ==="
+        if [ -f .clasp.json ]; then
+          cat .clasp.json
+        else
+          echo "❌ .clasp.json file missing!"
+          exit 1
+        fi
         
     - name: Push to Google Apps Script
       run: clasp push --force

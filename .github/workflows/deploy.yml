@@ -29,6 +29,11 @@ jobs:
           clasp login --creds service-account-key.json
           rm service-account-key.json
 
+      - name: Debug Service Account Key File
+        run: |
+          ls -l service-account-key.json
+          head -n 5 service-account-key.json
+
       - name: Authenticate Clasp with Service Account
         run: |
           echo "${{ secrets.GCP_SA_KEY_BASE64 }}" | base64 --decode > ./gcp-key.json

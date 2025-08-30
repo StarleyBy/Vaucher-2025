@@ -27,13 +27,9 @@ jobs:
       run: |
         echo $CLASP_AUTH_TOKEN | base64 -d > ~/.clasprc.json
         chmod 600 ~/.clasprc.json
-        
-    - name: Verify authentication
-      run: |
-        echo "Clasp version:"
-        clasp --version
-        echo "Auth file exists:"
-        ls -la ~/.clasprc.json
+        echo "=== DEBUG: .clasprc.json content ==="
+        cat ~/.clasprc.json
+        echo "=== END DEBUG ==="
         
     - name: Push to Google Apps Script
       run: clasp push --force

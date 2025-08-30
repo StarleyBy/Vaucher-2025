@@ -26,6 +26,12 @@ jobs:
           echo "${{ secrets.GCP_SA_KEY_BASE64 }}" | base64 --decode > ./gcp-key.json
           clasp login --creds ./gcp-key.json
 
+      - name: Debug Decoded Key
+        run: |
+          echo "--- Start of gcp-key.json ---"
+          cat ./gcp-key.json
+          echo "--- End of gcp-key.json ---"
+
       - name: Push to Google Apps Script
         run: clasp push
         working-directory: ./backend

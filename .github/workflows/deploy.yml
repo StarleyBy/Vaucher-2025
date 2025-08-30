@@ -3,7 +3,7 @@ name: Deploy Google Apps Script
 on:
   push:
     branches:
-      - main
+      - main # Измените, если ваша основная ветка называется иначе (например, master)
 
 jobs:
   deploy:
@@ -16,14 +16,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Можно заменить на 20, если нужно
+          node-version: '18' # Или другая версия Node.js, если требуется
 
       - name: Install Clasp
         run: npm install -g @google/clasp
 
-      - name: Authenticate Clasp
-        run: echo "{\"refresh_token\":\"${{ secrets.CLASP_TOKEN }}\"}" > ~/.clasprc.json
+      - name: Authenticate Clasp with Service Account
+        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" > ./gcp-key.json
+          clasp login --creds ./gcp-key.json
 
       - name: Push to Google Apps Script
         run: clasp push
-        working-directory: ./backend # Убедись, что путь верный
+        working-directory: ./backend # Убедитесь, что это путь к вашей папке со скриптом (main.gs, appsscript.json)

@@ -26,6 +26,14 @@ jobs:
           echo "${{ secrets.GCP_SA_KEY_BASE64 }}" | base64 --decode > ./gcp-key.json
           export GOOGLE_APPLICATION_CREDENTIALS=./gcp-key.json
 
+      - name: Debug Credentials
+        run: |
+          echo "GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
+          echo "Files in root directory:"
+          ls -la .
+          echo "Files in backend directory:"
+          ls -la ./backend
+
       - name: Push to Google Apps Script
         run: clasp push
         working-directory: ./backend

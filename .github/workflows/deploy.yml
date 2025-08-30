@@ -11,24 +11,26 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4 # Trigger new run
-    # Temporary comment to trigger new run
+      uses: actions/checkout@v4
       
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         
-    - name: Install dependencies
-      run: |
-        npm install googleapis google-auth-library
-        
-    - name: Deploy with Service Account
+    - name: Install Clasp
+      run: npm install -g @google/clasp@2.4.1
+      
+    - name: Authenticate Clasp
       env:
-        GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
-        SCRIPT_ID: ${{ secrets.SCRIPT_ID }}
+        CLASP_AUTH_TOKEN: ${{ secrets.CLASP_AUTH_TOKEN }}
       run: |
-        echo $GOOGLE_SERVICE_ACCOUNT_KEY | base64 -d > service-account.json
-        echo "Script ID: $SCRIPT_ID"
-        node deploy-script.js
+        echo $CLASP_AUTH_TOKEN | base64 -d > ~/.clasprc.json
+        chmod 600 ~/.clasprc.json
+        
+    - name: Verify authentication
+      run: clasp whoami
+      
+    - name: Push to Google Apps Script
+      run: clasp push --force
       working-directory: ./backend

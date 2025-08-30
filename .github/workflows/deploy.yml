@@ -23,21 +23,8 @@ jobs:
 
       - name: Authenticate Clasp with Service Account
         run: |
-          DECODED_KEY=$(echo "${{ secrets.GCP_SA_KEY_BASE64 }}" | base64 --decode)
-          echo "--- Decoded Key ---"
-          echo "$DECODED_KEY"
-          echo "--- End of Decoded Key ---"
-          echo "$DECODED_KEY" > ./gcp-key.json
+          echo "${{ secrets.GCP_SA_KEY }}" > ./gcp-key.json
           clasp login --creds ./gcp-key.json
-
-      - name: Check if key file is empty
-        run: |
-          if [ -s ./gcp-key.json ]; then
-            echo "gcp-key.json is not empty."
-          else
-            echo "gcp-key.json is empty."
-            exit 1
-          fi
 
       - name: Push to Google Apps Script
         run: clasp push

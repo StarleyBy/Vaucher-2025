@@ -25,7 +25,7 @@ jobs:
         env:
           CLASP_AUTH_TOKEN: ${{ secrets.CLASP_AUTH_TOKEN }}
         run: |
-          echo $CLASP_AUTH_TOKEN | base64 -d > ~/.clasp.json
+          echo $CLASP_AUTH_TOKEN | base64 -d > ~/.clasprc.json
 
       
 

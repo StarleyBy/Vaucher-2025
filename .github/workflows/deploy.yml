@@ -26,8 +26,10 @@ jobs:
           CLASP_JSON: ${{ secrets.CLASP_JSON }}
         run: |
           echo $CLASP_JSON | base64 -d > service-account-key.json
-          export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/service-account-key.json
-          clasp login --json
+          echo "--- DEBUG: service-account-key.json content (THIS EXPOSES SECRET) ---"
+          cat service-account-key.json
+          echo "-------------------------------------------------------------------"
+          clasp login --creds service-account-key.json
           rm service-account-key.json
 
       

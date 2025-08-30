@@ -23,11 +23,9 @@ jobs:
 
       - name: Authenticate Clasp
         env:
-          CLASP_JSON: ${{ secrets.CLASP_JSON }}
+          CLASP_AUTH_TOKEN: ${{ secrets.CLASP_AUTH_TOKEN }}
         run: |
-          echo $CLASP_JSON | base64 -d > service-account-key.json
-          clasp login --creds service-account-key.json
-          rm service-account-key.json
+          echo $CLASP_AUTH_TOKEN | base64 -d > ~/.clasp.json
 
       
 

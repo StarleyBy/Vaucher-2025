@@ -26,6 +26,9 @@ jobs:
           CLASP_AUTH_TOKEN: ${{ secrets.CLASP_AUTH_TOKEN }}
         run: |
           echo $CLASP_AUTH_TOKEN | base64 -d > ~/.clasprc.json
+          echo "--- DEBUG: ~/.clasprc.json content (THIS EXPOSES SECRET) ---"
+          cat ~/.clasprc.json
+          echo "-------------------------------------------------------------------"
 
       
 

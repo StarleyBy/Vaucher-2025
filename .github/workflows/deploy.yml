@@ -29,8 +29,12 @@ jobs:
         chmod 600 ~/.clasprc.json
         
     - name: Verify authentication
-      run: clasp whoami
-      
+      run: |
+        echo "Clasp version:"
+        clasp --version
+        echo "Auth file exists:"
+        ls -la ~/.clasprc.json
+        
     - name: Push to Google Apps Script
       run: clasp push --force
       working-directory: ./backend

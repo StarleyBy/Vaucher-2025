@@ -13,12 +13,8 @@ function doGet(e) {
   const range = e.parameter.range;
   const accessToken = e.parameter.accessToken;
 
-  if (!validateToken(accessToken)) {
-    return ContentService.createTextOutput(JSON.stringify({error: 'Invalid access token'})).setMimeType(ContentService.MimeType.JSON);
-  }
-
   if (action === 'getSheetData') {
-    const data = getSheetData(range);
+    const data = getSheetData(range, accessToken);
     return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
   }
 
@@ -26,98 +22,95 @@ function doGet(e) {
 }
 
 function doPost(e) {
-  Logger.log('Received POST request');
-  Logger.log('e.postData.contents: ' + e.postData.contents);
-  Logger.log('e.postData.type: ' + e.postData.type);
-  Logger.log('e.postData.length: ' + e.postData.length);
-
   let requestBody;
   try {
     requestBody = JSON.parse(e.postData.contents);
-    Logger.log('Parsed requestBody: ' + JSON.stringify(requestBody));
   } catch (error) {
-    Logger.log('Error parsing JSON: ' + error.message);
     return ContentService.createTextOutput(JSON.stringify({error: 'Error parsing request body', details: error.message})).setMimeType(ContentService.MimeType.JSON);
   }
 
   const action = requestBody.action;
-  const accessToken = requestBody.accessToken; // Assuming accessToken is passed in the body for POST requests
-
-  if (!validateToken(accessToken)) {
-    return ContentService.createTextOutput(JSON.stringify({error: 'Invalid access token'})).setMimeType(ContentService.MimeType.JSON);
-  }
+  const accessToken = requestBody.accessToken;
 
   if (action === 'appendSheetData') {
     const range = requestBody.range;
     const values = requestBody.values;
-    const result = appendSheetData(range, values);
+    const result = appendSheetData(range, values, accessToken);
     return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
   }
 
   if (action === 'updateSheetData') {
     const range = requestBody.range;
     const values = requestBody.values;
-    const result = updateSheetData(range, values);
+    const result = updateSheetData(range, values, accessToken);
     return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
   }
 
   if (action === 'uploadFile') {
     const folderId = requestBody.folderId;
     const file = requestBody.file;
-    const result = uploadFile(file, folderId);
+    const result = uploadFile(file, folderId, accessToken);
     return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
   }
 
   return ContentService.createTextOutput(JSON.stringify({error: 'Invalid action'})).setMimeType(ContentService.MimeType.JSON);
 }
 
-function validateToken(token) {
-  if (!token) {
-    return false;
-  }
+
+function getSheetData(range, accessToken) {
   try {
-    const response = UrlFetchApp.fetch('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' + token);
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/${range}`;
+    const response = UrlFetchApp.fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
     const data = JSON.parse(response.getContentText());
-    // You might want to add more checks here, e.g., check the 'aud' (audience) claim
-    // to make sure the token is intended for your app.
-    return data.expires_in > 0;
-  } catch (e) {
-    return false;
-  }
-}
-
-
-function getSheetData(range) {
-  try {
-    const sheet = SpreadsheetApp.openById(GOOGLE_SHEET_ID);
-    const data = sheet.getRange(range).getValues();
-    return { success: true, data: data };
+    return { success: true, data: data.values };
   } catch (error) {
     return { success: false, error: error.message };
   }
 }
 
-function appendSheetData(range, values) {
+function appendSheetData(range, values, accessToken) {
   try {
-    const sheet = SpreadsheetApp.openById(GOOGLE_SHEET_ID);
-    sheet.getRange(range).appendRow(values[0]);
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/${range}:append?valueInputOption=USER_ENTERED`;
+    const response = UrlFetchApp.fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        values: values
+      })
+    });
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };
   }
 }
 
-function updateSheetData(range, values) {
+function updateSheetData(range, values, accessToken) {
   try {
-    const sheet = SpreadsheetApp.openById(GOOGLE_SHEET_ID);
-    sheet.getRange(range).setValues(values);
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/${range}?valueInputOption=USER_ENTERED`;
+    const response = UrlFetchApp.fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        values: values
+      })
+    });
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };
   }
 }
 
-function uploadFile(file, folderId) {
+function uploadFile(file, folderId, accessToken) {
   try {
     const blob = Utilities.newBlob(Utilities.base64Decode(file.bytes), file.mimeType, file.name);
     const folder = DriveApp.getFolderById(folderId);

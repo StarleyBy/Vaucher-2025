@@ -11,6 +11,11 @@ const PAYMENT_200_FILE_FOLDER_ID = '1paDpElQ2tRI7RlhB3yl2FO8o1gPyVjIDh32PXLrIlzO
 function doGet(e) {
   const action = e.parameter.action;
   const range = e.parameter.range;
+  const accessToken = e.parameter.accessToken;
+
+  if (!validateToken(accessToken)) {
+    return ContentService.createTextOutput(JSON.stringify({error: 'Invalid access token'})).setMimeType(ContentService.MimeType.JSON);
+  }
 
   if (action === 'getSheetData') {
     const data = getSheetData(range);
@@ -36,6 +41,11 @@ function doPost(e) {
   }
 
   const action = requestBody.action;
+  const accessToken = requestBody.accessToken; // Assuming accessToken is passed in the body for POST requests
+
+  if (!validateToken(accessToken)) {
+    return ContentService.createTextOutput(JSON.stringify({error: 'Invalid access token'})).setMimeType(ContentService.MimeType.JSON);
+  }
 
   if (action === 'appendSheetData') {
     const range = requestBody.range;
@@ -59,6 +69,21 @@ function doPost(e) {
   }
 
   return ContentService.createTextOutput(JSON.stringify({error: 'Invalid action'})).setMimeType(ContentService.MimeType.JSON);
+}
+
+function validateToken(token) {
+  if (!token) {
+    return false;
+  }
+  try {
+    const response = UrlFetchApp.fetch('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' + token);
+    const data = JSON.parse(response.getContentText());
+    // You might want to add more checks here, e.g., check the 'aud' (audience) claim
+    // to make sure the token is intended for your app.
+    return data.expires_in > 0;
+  } catch (e) {
+    return false;
+  }
 }
 
 

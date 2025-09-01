@@ -2,33 +2,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     const studentNameSelect = document.getElementById('student-name');
     const tzNumberInput = document.getElementById('tz-number');
 
-    // Fetch students who need confirmations
-    const students = (await getSheetData('MAIN!A:Q')).map((row, index) => ({
-        name: row[0],
-        tz: row[3],
-        rowNum: index + 1, // +1 because sheet rows are 1-based
-        needsConfirmation: row[0] && !row[15] && !row[16]
-    })).filter(student => student.needsConfirmation);
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accessToken = user ? user.accessToken : null;
 
-    if (students) {
-        students.forEach(student => {
-            const option = document.createElement('option');
-            option.value = student.name;
-            option.textContent = student.name;
-            option.dataset.tz = student.tz;
-            option.dataset.rowNum = student.rowNum;
-            studentNameSelect.appendChild(option);
-        });
+    if (!accessToken) {
+        alert('Вы не авторизованы.');
+        window.location.href = 'index.html';
+        return;
     }
 
-    studentNameSelect.addEventListener('change', (e) => {
-        const selectedOption = e.target.options[e.target.selectedIndex];
-        tzNumberInput.value = selectedOption.dataset.tz;
-    });
+    // Fetch students who need confirmations
+    const studentsData = await getSheetData('MAIN!A:Q', accessToken);
+    if (studentsData) {
+        const students = studentsData.map((row, index) => ({
+            name: row[0],
+            tz: row[3],
+            rowNum: index + 1, // +1 because sheet rows are 1-based
+            needsConfirmation: row[0] && !row[15] && !row[16]
+        })).filter(student => student.needsConfirmation);
 
-    // Trigger change event to populate TZ for the first student
-    if (studentNameSelect.options.length > 0) {
-        studentNameSelect.dispatchEvent(new Event('change'));
+        if (students) {
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.name;
+                option.textContent = student.name;
+                option.dataset.tz = student.tz;
+                option.dataset.rowNum = student.rowNum;
+                studentNameSelect.appendChild(option);
+            });
+        }
+
+        studentNameSelect.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            tzNumberInput.value = selectedOption.dataset.tz;
+        });
+
+        // Trigger change event to populate TZ for the first student
+        if (studentNameSelect.options.length > 0) {
+            studentNameSelect.dispatchEvent(new Event('change'));
+        }
     }
 
 
@@ -45,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let ishurArshamaLink = '';
         if (ishurArshamaFile) {
-            const uploadResponse = await uploadFile(ishurArshamaFile, ISHUR_ARSHAMA_FOLDER_ID);
+            const uploadResponse = await uploadFile(ishurArshamaFile, ISHUR_ARSHAMA_FOLDER_ID, accessToken);
             if (uploadResponse) {
                 ishurArshamaLink = uploadResponse.webViewLink;
             }
@@ -53,13 +65,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let ishurThilatLimudimLink = '';
         if (ishurThilatLimudimFile) {
-            const uploadResponse = await uploadFile(ishurThilatLimudimFile, ISHUR_THILAT_LIMUDIM_FOLDER_ID);
+            const uploadResponse = await uploadFile(ishurThilatLimudimFile, ISHUR_THILAT_LIMUDIM_FOLDER_ID, accessToken);
             if (uploadResponse) {
                 ishurThilatLimudimLink = uploadResponse.webViewLink;
             }
         }
 
-        const response = await updateSheetData(`MAIN!P${rowNum}:Q${rowNum}`, [[ishurArshamaLink, ishurThilatLimudimLink]]);
+        const response = await updateSheetData(`MAIN!P${rowNum}:Q${rowNum}`, [[ishurArshamaLink, ishurThilatLimudimLink]], accessToken);
 
         if (response) {
             alert('Ишуры успешно обновлены!');

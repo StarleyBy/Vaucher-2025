@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let studentsData = [];
 
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accessToken = user ? user.accessToken : null;
+
     async function renderTable(data) {
         databaseTable.innerHTML = '';
         const table = document.createElement('table');
@@ -38,9 +41,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Fetch and display all students initially
-    studentsData = await getSheetData('MAIN!A:S');
-    if (studentsData) {
-        renderTable(studentsData);
+    if (accessToken) {
+        studentsData = await getSheetData('MAIN!A:S', accessToken);
+        if (studentsData) {
+            renderTable(studentsData);
+        }
+    } else {
+        alert('Вы не авторизованы.');
+        window.location.href = 'index.html';
     }
 
     // Handle search

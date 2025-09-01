@@ -3,8 +3,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const addGroupButton = document.getElementById('add-group-button');
     let groupCount = 0;
 
-    const teachers = (await getSheetData('SERV!A3:E')).filter(row => row[1] === 'учитель').map(row => row[0]);
-    const classTimes = (await getSheetData('SERV!H3:H29')).map(row => row[0]);
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accessToken = user ? user.accessToken : null;
+
+    if (!accessToken) {
+        alert('Вы не авторизованы.');
+        window.location.href = 'index.html';
+        return;
+    }
+
+    const teachersData = await getSheetData('SERV!A3:E', accessToken);
+    const classTimesData = await getSheetData('SERV!H3:H29', accessToken);
+
+    if (!teachersData || !classTimesData) {
+        alert('Ошибка при загрузке данных для формы.');
+        return;
+    }
+
+    const teachers = teachersData.filter(row => row[1] === 'учитель').map(row => row[0]);
+    const classTimes = classTimesData.map(row => row[0]);
 
     function addGroupForm() {
         groupCount++;
@@ -98,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ]);
         }
 
-        const response = await appendSheetData('SERV!K3', groups);
+        const response = await appendSheetData('SERV!K3', groups, accessToken);
 
         if (response) {
             alert('Группы успешно добавлены!');

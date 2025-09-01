@@ -4,7 +4,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const groupSelect = document.getElementById('group');
     const paymentOptionSelect = document.getElementById('payment-option');
 
-    const cities = await getSheetData('SERV!G3:G');
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accessToken = user ? user.accessToken : null;
+
+    if (!accessToken) {
+        alert('Вы не авторизованы.');
+        window.location.href = 'index.html';
+        return;
+    }
+
+    const cities = await getSheetData('SERV!G3:G', accessToken);
     if (cities) {
         cities.forEach(city => {
             const option = document.createElement('option');
@@ -14,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    const groups = await getSheetData('SERV!T3:T');
+    const groups = await getSheetData('SERV!T3:T', accessToken);
     if (groups) {
         groups.forEach(group => {
             const option = document.createElement('option');
@@ -24,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    const paymentOptions = await getSheetData('SERV!I3:I');
+    const paymentOptions = await getSheetData('SERV!I3:I', accessToken);
     if (paymentOptions) {
         paymentOptions.forEach(optionData => {
             const option = document.createElement('option');
@@ -73,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let tzFileLink = '';
         if (tzFile) {
-            const tzFileUploadResponse = await uploadFile(tzFile, TZ_FILE_FOLDER_ID);
+            const tzFileUploadResponse = await uploadFile(tzFile, TZ_FILE_FOLDER_ID, accessToken);
             if (tzFileUploadResponse) {
                 tzFileLink = tzFileUploadResponse.webViewLink;
             }
@@ -81,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let voucherFileLink = '';
         if (voucherFile) {
-            const voucherFileUploadResponse = await uploadFile(voucherFile, VOUCHER_FILE_FOLDER_ID);
+            const voucherFileUploadResponse = await uploadFile(voucherFile, VOUCHER_FILE_FOLDER_ID, accessToken);
             if (voucherFileUploadResponse) {
                 voucherFileLink = voucherFileUploadResponse.webViewLink;
             }
@@ -89,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let payment200FileLink = '';
         if (payment200File) {
-            const payment200FileUploadResponse = await uploadFile(payment200File, PAYMENT_200_FILE_FOLDER_ID);
+            const payment200FileUploadResponse = await uploadFile(payment200File, PAYMENT_200_FILE_FOLDER_ID, accessToken);
             if (payment200FileUploadResponse) {
                 payment200FileLink = payment200FileUploadResponse.webViewLink;
             }
@@ -115,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ];
 
         // 4. Append data to Google Sheet
-        const response = await appendSheetData('MAIN!A1', [rowData]);
+        const response = await appendSheetData('MAIN!A1', [rowData], accessToken);
 
         if (response) {
             alert('Студент успешно добавлен!');

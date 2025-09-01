@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>База учеников ульпана с ваучером</title>
-    <link rel="stylesheet" href="Vaucher/assets/css/styles.css">
-    <link rel="manifest" href="Vaucher/manifest.json">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="manifest" href="manifest.json">
     
 </head>
 <body>
@@ -28,12 +28,11 @@
         </div>
     </div>
     
-    <script src="Vaucher/assets/js/auth.js"></script>
-    <script src="https://accounts.google.com/gsi/client"></script>
+    <script src="assets/js/auth.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('Vaucher/sw.js').then(registration => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
                     console.log('ServiceWorker registration successful with scope: ', registration.scope);
                 }, err => {
                     console.log('ServiceWorker registration failed: ', err);

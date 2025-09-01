@@ -1,3 +1,5 @@
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw2etfZwIDSQITmYXNaM-ZniMChB7MxkkIuNe4GXjm9GbrFQzbqVDJTAyZiEEPYn4yuxQ/exec';
+
 async function getSheetData(range) {
     const url = `${WEB_APP_URL}?action=getSheetData&range=${range}`;
     try {

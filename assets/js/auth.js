@@ -1,26 +1,4 @@
-// This function is called by Google after the user signs in.
-function handleCredentialResponse(response) {
-    // The response object contains the JWT credential.
-    const credential = response.credential;
 
-    // Decode the JWT to get user's email and name
-    const payload = JSON.parse(atob(credential.split('.')[1]));
-    const userEmail = payload.email;
-    const userName = payload.name;
-
-    // Now, get an access token to make API calls.
-    const client = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
-        callback: (tokenResponse) => {
-            if (tokenResponse && tokenResponse.access_token) {
-                // We have the access token. Now verify the user's role from the sheet.
-                verifyUserRole(userEmail, userName, tokenResponse.access_token);
-            }
-        },
-    });
-    client.requestAccessToken();
-}
 
 async function verifyUserRole(email, name, accessToken) {
     // Use the access token to fetch the staff data

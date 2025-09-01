@@ -6,14 +6,14 @@
     <title>База учеников ульпана с ваучером</title>
     <link rel="stylesheet" href="Vaucher/assets/css/styles.css">
     <link rel="manifest" href="Vaucher/manifest.json">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
 </head>
 <body>
     <div class="container">
         <div class="login-container">
             <h1>Вход</h1>
             <div id="g_id_onload"
-                 data-client_id="399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com"
+                                  data-client_id="399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com"
                  data-callback="handleCredentialResponse"
                  data-auto_select="true">
             </div>
@@ -29,6 +29,7 @@
     </div>
     
     <script src="Vaucher/assets/js/auth.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

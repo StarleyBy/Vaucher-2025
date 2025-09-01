@@ -13,7 +13,7 @@ const urlsToCache = [
   '/assets/js/main.js',
   '/assets/js/auth.js',
   '/assets/js/google-api.js',
-  '/config/google-config.js',
+  
   '/assets/js/база.js',
   '/assets/js/ишуры.js',
   '/assets/js/квитанции.js',

@@ -24,6 +24,7 @@
                 const client = google.accounts.oauth2.initTokenClient({
                     client_id: '399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com',
                     scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
+                    ux_mode: 'redirect',
                     callback: (tokenResponse) => {
                         if (tokenResponse && tokenResponse.access_token) {
                             // We have the access token. Now verify the user's role from the sheet.

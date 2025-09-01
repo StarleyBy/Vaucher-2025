@@ -1,4 +1,3 @@
-
 const CACHE_NAME = 'vaucher-cache-v1';
 const urlsToCache = [
   '/',
@@ -13,7 +12,6 @@ const urlsToCache = [
   '/assets/js/main.js',
   '/assets/js/auth.js',
   '/assets/js/google-api.js',
-  
   '/assets/js/база.js',
   '/assets/js/ишуры.js',
   '/assets/js/квитанции.js',
@@ -26,7 +24,9 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        return cache.addAll(urlsToCache).catch(error => {
+          console.error('Failed to cache:', error);
+        });
       })
   );
 });

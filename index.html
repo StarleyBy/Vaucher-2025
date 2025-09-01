@@ -3,49 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Р‘Р°Р·Р° СѓС‡РµРЅРёРєРѕРІ СѓР»СЊРїР°РЅР° СЃ РІР°СѓС‡РµСЂРѕРј</title>
+    <title>База учеников ульпана с ваучером</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="manifest" href="manifest.json">
     <script>
         // This function is called by Google after the user signs in.
         function handleCredentialResponse(response) {
-            // The response object contains the JWT credential.
-            const credential = response.credential;
+            try {
+                // The response object contains the JWT credential.
+                const credential = response.credential;
 
-            // Decode the JWT to get user's email and name
-            const payload = JSON.parse(atob(credential.split('.')[1]));
-            const userEmail = payload.email;
-            const userName = payload.name;
+                // Decode the JWT to get user's email and name
+                const payload = JSON.parse(atob(credential.split('.')[1]));
+                const userEmail = payload.email;
+                const userName = payload.name;
 
-            // Now, get an access token to make API calls.
-            const client = google.accounts.oauth2.initTokenClient({
-                client_id: '399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com',
-                scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
-                callback: (tokenResponse) => {
-                    if (tokenResponse && tokenResponse.access_token) {
-                        // We have the access token. Now verify the user's role from the sheet.
-                        verifyUserRole(userEmail, userName, tokenResponse.access_token);
-                    }
-                },
-            });
-            client.requestAccessToken();
+                console.log('User signed in:', userName, userEmail);
+
+                // Now, get an access token to make API calls.
+                const client = google.accounts.oauth2.initTokenClient({
+                    client_id: '399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com',
+                    scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
+                    callback: (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            // We have the access token. Now verify the user's role from the sheet.
+                            if (typeof verifyUserRole === 'function') {
+                                verifyUserRole(userEmail, userName, tokenResponse.access_token);
+                            } else {
+                                console.error('verifyUserRole function is not defined');
+                                // Временное решение - перенаправление на главную страницу
+                                window.location.href = 'dashboard.html';
+                            }
+                        } else {
+                            console.error('Failed to get access token');
+                        }
+                    },
+                });
+                client.requestAccessToken();
+            } catch (error) {
+                console.error('Error in handleCredentialResponse:', error);
+            }
+        }
+
+        // Заглушка для функции verifyUserRole (удалите когда создадите настоящую)
+        function verifyUserRole(email, name, accessToken) {
+            console.log('Verifying user role for:', email);
+            // Здесь должна быть логика проверки роли пользователя
+            // Пока что просто перенаправляем на dashboard
+            // window.location.href = 'dashboard.html';
         }
     </script>
-    <script src="https://accounts.google.com/gsi/client"></script>
-    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <div class="container">
         <div class="login-container">
-            <h1>Р’С…РѕРґ</h1>
+            <h1>Вход</h1>
             <div id="g_id_onload"
-                                  data-client_id="399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com"
+                 data-client_id="399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com"
                  data-callback="handleCredentialResponse"
                  data-auto_select="true">
             </div>
             <div class="g_id_signin"
                  data-type="standard"
-                 data-shape="rectangular"                 
+                 data-shape="rectangular"
                  data-theme="outline"
                  data-text="signin_with"
                  data-size="large"
@@ -53,16 +74,19 @@
             </div>
         </div>
     </div>
-    
+
     <script src="assets/js/auth.js"></script>
     <script>
+        // Service Worker registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
             });
         }
     </script>

@@ -32,6 +32,10 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (event.request.url.indexOf('https://accounts.google.com/gsi/client') === 0) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {

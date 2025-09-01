@@ -6,33 +6,49 @@
     <title>    </title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="manifest" href="manifest.json">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <h1></h1>
+            <div id="g_id_onload"></div>
+            <div id="g_id_signin"></div>
+        </div>
+    </div>
+
+    <script src="assets/js/auth.js"></script>
     <script>
-        // This function is called by Google after the user signs in.
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: '399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com',
+                callback: handleCredentialResponse
+            });
+            google.accounts.id.renderButton(
+                document.getElementById('g_id_signin'),
+                { theme: 'outline', size: 'large' }
+            );
+            google.accounts.id.prompt();
+        }
+
         function handleCredentialResponse(response) {
             try {
-                // The response object contains the JWT credential.
                 const credential = response.credential;
-
-                // Decode the JWT to get user's email and name
                 const payload = JSON.parse(atob(credential.split('.')[1]));
                 const userEmail = payload.email;
                 const userName = payload.name;
 
                 console.log('User signed in:', userName, userEmail);
 
-                // Now, get an access token to make API calls.
                 const client = google.accounts.oauth2.initTokenClient({
                     client_id: '399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com',
                     scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
-                    ux_mode: 'redirect',
                     callback: (tokenResponse) => {
                         if (tokenResponse && tokenResponse.access_token) {
-                            // We have the access token. Now verify the user's role from the sheet.
                             if (typeof verifyUserRole === 'function') {
                                 verifyUserRole(userEmail, userName, tokenResponse.access_token);
                             } else {
                                 console.error('verifyUserRole function is not defined');
-                                //   -    
                                 window.location.href = 'dashboard.html';
                             }
                         } else {
@@ -46,29 +62,6 @@
             }
         }
     </script>
-    <script src="https://accounts.google.com/gsi/client" async defer crossorigin="anonymous"></script>
-</head>
-<body>
-    <div class="container">
-        <div class="login-container">
-            <h1></h1>
-            <div id="g_id_onload"
-                 data-client_id="399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com"
-                 data-callback="handleCredentialResponse"
-                 data-auto_select="true">
-            </div>
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-shape="rectangular"
-                 data-theme="outline"
-                 data-text="signin_with"
-                 data-size="large"
-                 data-logo_alignment="left">
-            </div>
-        </div>
-    </div>
-
-    <script src="assets/js/auth.js"></script>
     <script>
         // Service Worker registration
         if ('serviceWorker' in navigator) {

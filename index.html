@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>База учеников ульпана с ваучером</title>
+    <title>    </title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="manifest" href="manifest.json">
     <script>
@@ -31,7 +31,7 @@
                                 verifyUserRole(userEmail, userName, tokenResponse.access_token);
                             } else {
                                 console.error('verifyUserRole function is not defined');
-                                // Временное решение - перенаправление на главную страницу
+                                //   -    
                                 window.location.href = 'dashboard.html';
                             }
                         } else {
@@ -44,21 +44,13 @@
                 console.error('Error in handleCredentialResponse:', error);
             }
         }
-
-        // Заглушка для функции verifyUserRole (удалите когда создадите настоящую)
-        function verifyUserRole(email, name, accessToken) {
-            console.log('Verifying user role for:', email);
-            // Здесь должна быть логика проверки роли пользователя
-            // Пока что просто перенаправляем на dashboard
-            // window.location.href = 'dashboard.html';
-        }
     </script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <div class="container">
         <div class="login-container">
-            <h1>Вход</h1>
+            <h1></h1>
             <div id="g_id_onload"
                  data-client_id="399222378656-jr2tbed8mlclebr6hjg7s8banfdcvfb7.apps.googleusercontent.com"
                  data-callback="handleCredentialResponse"
